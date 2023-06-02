@@ -21,8 +21,6 @@ class TabBarViewController: UITabBarController {
         return appearence
     }()
     
-    private let a = UINavigationBarAppearance()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         UITabBar.appearance().tintColor = .label
