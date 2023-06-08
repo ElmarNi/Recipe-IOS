@@ -18,9 +18,13 @@
 		EB4748782A26A9E1009618E6 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4748772A26A9E1009618E6 /* BookmarksViewController.swift */; };
 		EB47487A2A26A9E5009618E6 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4748792A26A9E5009618E6 /* ProfileViewController.swift */; };
 		EB8B3A062A290CA300F64B55 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB8B3A052A290CA300F64B55 /* Extensions.swift */; };
+		EB9F592B2A2EFD1C0080D9B9 /* PopularRecipeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9F592A2A2EFD1C0080D9B9 /* PopularRecipeCollectionViewCell.swift */; };
+		EB9F592D2A2F02F60080D9B9 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9F592C2A2F02F60080D9B9 /* Recipe.swift */; };
+		EB9F592F2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9F592E2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift */; };
 		EBA164652A2A01F1007D9F11 /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA164642A2A01F1007D9F11 /* CategoryCollectionViewCell.swift */; };
 		EBF41D062A28DAE60093F43A /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF41D052A28DAE60093F43A /* Category.swift */; };
 		EBF41D082A28DBAD0093F43A /* APICaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF41D072A28DBAC0093F43A /* APICaller.swift */; };
+		EBFBBB7C2A2E3E1300FEF482 /* HeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFBBB7B2A2E3E1300FEF482 /* HeaderCollectionReusableView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,9 +41,13 @@
 		EB4748772A26A9E1009618E6 /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
 		EB4748792A26A9E5009618E6 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		EB8B3A052A290CA300F64B55 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		EB9F592A2A2EFD1C0080D9B9 /* PopularRecipeCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopularRecipeCollectionViewCell.swift; sourceTree = "<group>"; };
+		EB9F592C2A2F02F60080D9B9 /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
+		EB9F592E2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendedRecipeCollectionViewCell.swift; sourceTree = "<group>"; };
 		EBA164642A2A01F1007D9F11 /* CategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		EBF41D052A28DAE60093F43A /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		EBF41D072A28DBAC0093F43A /* APICaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICaller.swift; sourceTree = "<group>"; };
+		EBFBBB7B2A2E3E1300FEF482 /* HeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +96,9 @@
 			children = (
 				EB4748592A26A164009618E6 /* LaunchScreen.storyboard */,
 				EBA164642A2A01F1007D9F11 /* CategoryCollectionViewCell.swift */,
+				EBFBBB7B2A2E3E1300FEF482 /* HeaderCollectionReusableView.swift */,
+				EB9F592A2A2EFD1C0080D9B9 /* PopularRecipeCollectionViewCell.swift */,
+				EB9F592E2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -96,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				EBF41D052A28DAE60093F43A /* Category.swift */,
+				EB9F592C2A2F02F60080D9B9 /* Recipe.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -227,11 +239,15 @@
 			files = (
 				EB4748782A26A9E1009618E6 /* BookmarksViewController.swift in Sources */,
 				EB4748732A26A9C7009618E6 /* SearchViewController.swift in Sources */,
+				EB9F592B2A2EFD1C0080D9B9 /* PopularRecipeCollectionViewCell.swift in Sources */,
 				EB4748712A26A296009618E6 /* TabBarViewController.swift in Sources */,
 				EBF41D082A28DBAD0093F43A /* APICaller.swift in Sources */,
 				EBA164652A2A01F1007D9F11 /* CategoryCollectionViewCell.swift in Sources */,
+				EB9F592F2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift in Sources */,
+				EBFBBB7C2A2E3E1300FEF482 /* HeaderCollectionReusableView.swift in Sources */,
 				EB4748752A26A9CF009618E6 /* AddViewController.swift in Sources */,
 				EB47484F2A26A163009618E6 /* AppDelegate.swift in Sources */,
+				EB9F592D2A2F02F60080D9B9 /* Recipe.swift in Sources */,
 				EBF41D062A28DAE60093F43A /* Category.swift in Sources */,
 				EB4748512A26A163009618E6 /* SceneDelegate.swift in Sources */,
 				EB47487A2A26A9E5009618E6 /* ProfileViewController.swift in Sources */,

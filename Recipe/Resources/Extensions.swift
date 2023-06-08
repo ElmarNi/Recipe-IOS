@@ -44,27 +44,27 @@ extension String {
 }
 
 extension UIImageView {
-    func downloaded(from url: URL, sessionDelegate: URLSessionDelegate, completion: (() -> Void)? = nil) {
-        URLSession(
-            configuration: URLSessionConfiguration.default,
-            delegate: sessionDelegate,
-            delegateQueue: OperationQueue.main).dataTask(with: url)
-        { data, response, error in
-            guard
-                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
-                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
-                let data = data, error == nil,
-                let image = UIImage(data: data)
-            else {
-                self.image = UIImage(systemName: "photo")
+    func download(from url: URL, sessionDelegate: URLSessionDelegate, completion: (() -> Void)? = nil) {
+        DispatchQueue.main.async {
+            URLSession(
+                configuration: URLSessionConfiguration.default,
+                delegate: sessionDelegate,
+                delegateQueue: OperationQueue.main).dataTask(with: url)
+            { data, response, error in
+                guard
+                    let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+                    let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                    let data = data, error == nil,
+                    let image = UIImage(data: data)
+                else {
+                    self.image = UIImage(named: "no-image")
+                    completion?()
+                    return
+                }
+                self.image = image
                 completion?()
-                return
-            }
-            DispatchQueue.main.async() { [weak self] in
-                self?.image = image
-                completion?()
-            }
-        }.resume()
+            }.resume()
+        }
     }
 }
 

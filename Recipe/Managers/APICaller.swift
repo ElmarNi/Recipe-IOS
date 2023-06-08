@@ -31,7 +31,7 @@ final class ApiCaller {
     static let shared = ApiCaller()
     
     public func getCategories(sessionDelegate: URLSessionDelegate, completion: @escaping (Result<[Category], Error>) -> Void) {
-        createRequest(with: URL(string: Constants.baseUrl + "GetCategories"), type: .GET) { request in
+        createRequest(with: URL(string: Constants.baseUrl + "Category/GetCategories"), type: .GET) { request in
             URLSession(
                 configuration: URLSessionConfiguration.default,
                 delegate: sessionDelegate,
@@ -43,6 +43,50 @@ final class ApiCaller {
                 }
                 do {
                     let result = try JSONDecoder().decode([Category].self, from: data)
+                    completion(.success(result))
+                }
+                catch {
+                    completion(.failure(error))
+                }
+            }.resume()
+        }
+    }
+    
+    public func getPopularRecipes(sessionDelegate: URLSessionDelegate, completion: @escaping (Result<[Recipe], Error>) -> Void) {
+        createRequest(with: URL(string: Constants.baseUrl + "Recipe/GetPopularRecipes"), type: .GET) { request in
+            URLSession(
+                configuration: URLSessionConfiguration.default,
+                delegate: sessionDelegate,
+                delegateQueue: OperationQueue.main).dataTask(with: request)
+            { data, _, error in
+                guard let data = data, error == nil else {
+                    completion(.failure(ApiError("Failed to get data")))
+                    return
+                }
+                do {
+                    let result = try JSONDecoder().decode([Recipe].self, from: data)
+                    completion(.success(result))
+                }
+                catch {
+                    completion(.failure(error))
+                }
+            }.resume()
+        }
+    }
+    
+    public func getRecommendedRecipes(sessionDelegate: URLSessionDelegate, completion: @escaping (Result<[Recipe], Error>) -> Void) {
+        createRequest(with: URL(string: Constants.baseUrl + "Recipe/RecommendedRecipes"), type: .GET) { request in
+            URLSession(
+                configuration: URLSessionConfiguration.default,
+                delegate: sessionDelegate,
+                delegateQueue: OperationQueue.main).dataTask(with: request)
+            { data, _, error in
+                guard let data = data, error == nil else {
+                    completion(.failure(ApiError("Failed to get data")))
+                    return
+                }
+                do {
+                    let result = try JSONDecoder().decode([Recipe].self, from: data)
                     completion(.success(result))
                 }
                 catch {
