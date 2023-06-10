@@ -1,22 +1,14 @@
 //
-//  CategoryCollectionViewCell.swift
+//  CategoryHeaderCollectionReusableView.swift
 //  Recipe
 //
-//  Created by Elmar Ibrahimli on 02.06.23.
+//  Created by Elmar Ibrahimli on 10.06.23.
 //
 
 import UIKit
 
-class CategoryCollectionViewCell: UICollectionViewCell {
-    static let identifier = "CategoryCollectionViewCell"
-    
-    private let label: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 1
-        label.font = .systemFont(ofSize: 18, weight: .semibold)
-        label.textAlignment = .center
-        return label
-    }()
+class CategoryHeaderCollectionReusableView: UICollectionReusableView {
+    static let identifier = "CategoryHeaderCollectionReusableView"
     
     private let image: UIImageView = {
         let imageView = UIImageView()
@@ -33,10 +25,19 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         return spinner
     }()
     
+    private let nameLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 20, weight: .semibold)
+        label.textAlignment = .center
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(image)
-        contentView.addSubview(label)
+        backgroundColor = .systemBackground
+        addSubview(image)
+        addSubview(nameLabel)
         image.addSubview(spinner)
     }
     
@@ -46,16 +47,16 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        label.sizeToFit()
-        image.frame = CGRect(x: 0, y: 5, width: contentView.width - 10, height: contentView.height - label.height - 15)
+        image.frame = CGRect(x: (width - width / 1.2) / 2, y: 10, width: width / 1.2, height: width / 2)
         spinner.frame = CGRect(x: image.width / 2, y: image.height / 2, width: 0, height: 0)
-        label.frame = CGRect(x: 0, y: image.bottom + 5, width: contentView.width, height: label.height)
+        let nameLabelHeight = nameLabel.text?.getHeightForLabel(font: .systemFont(ofSize: 20, weight: .semibold), width: width - 20)
+        nameLabel.frame = CGRect(x: 10, y: image.bottom + 5, width: width - 20, height: nameLabelHeight ?? 0)
     }
     
     public func configure(with model: Category) {
-        label.text = model.name
+        nameLabel.text = model.name
         guard let url = URL(string: model.imageUrl ?? "") else { return }
-        image.download(from: url, sessionDelegate: self) {[weak self] in
+        image.download(from: url, sessionDelegate: self) { [weak self] in
             self?.spinner.stopAnimating()
         }
     }

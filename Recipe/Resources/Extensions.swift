@@ -34,6 +34,18 @@ extension UIView {
     }
 }
 
+extension UIView: URLSessionDelegate {
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+    }
+}
+
+extension UIViewController: URLSessionDelegate {
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+    }
+}
+
 extension String {
     func getHeightForLabel(font: UIFont, width: CGFloat) -> CGFloat {
         let constraintRect = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
@@ -42,7 +54,6 @@ extension String {
         return boundingBox.height
     }
 }
-
 extension UIImageView {
     func download(from url: URL, sessionDelegate: URLSessionDelegate, completion: (() -> Void)? = nil) {
         DispatchQueue.main.async {

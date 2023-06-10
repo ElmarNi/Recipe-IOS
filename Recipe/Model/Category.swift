@@ -11,4 +11,5 @@ struct Category: Codable {
     let id: Int
     let name: String
     let imageUrl: String?
+    let iconUrl: String?
 }

@@ -75,7 +75,54 @@ final class ApiCaller {
     }
     
     public func getRecommendedRecipes(sessionDelegate: URLSessionDelegate, completion: @escaping (Result<[Recipe], Error>) -> Void) {
-        createRequest(with: URL(string: Constants.baseUrl + "Recipe/RecommendedRecipes"), type: .GET) { request in
+        createRequest(with: URL(string: Constants.baseUrl + "Recipe/GetRecommendedRecipes"), type: .GET) { request in
+            URLSession(
+                configuration: URLSessionConfiguration.default,
+                delegate: sessionDelegate,
+                delegateQueue: OperationQueue.main).dataTask(with: request)
+            { data, _, error in
+                guard let data = data, error == nil else {
+                    completion(.failure(ApiError("Failed to get data")))
+                    return
+                }
+                do {
+                    let result = try JSONDecoder().decode([Recipe].self, from: data)
+                    completion(.success(result))
+                }
+                catch {
+                    completion(.failure(error))
+                }
+            }.resume()
+        }
+    }
+    
+    public func searchRecipe(with query: String, sessionDelegate: URLSessionDelegate, completion: @escaping (Result<[Recipe], Error>) -> Void) {
+        let urlString = Constants.baseUrl + "Recipe/SearchRecipes?query=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        
+        createRequest(with: URL(string: urlString), type: .GET) { request in
+            URLSession(
+                configuration: URLSessionConfiguration.default,
+                delegate: sessionDelegate,
+                delegateQueue: OperationQueue.main).dataTask(with: request)
+            { data, _, error in
+                guard let data = data, error == nil else {
+                    completion(.failure(ApiError("Failed to get data")))
+                    return
+                }
+                do {
+                    let result = try JSONDecoder().decode([Recipe].self, from: data)
+                    completion(.success(result))
+                }
+                catch {
+                    completion(.failure(error))
+                }
+            }.resume()
+        }
+    }
+    
+    public func getRecipesByCategoryId(categoryId: Int, sessionDelegate: URLSessionDelegate, completion: @escaping (Result<[Recipe], Error>) -> Void) {
+        
+        createRequest(with: URL(string: Constants.baseUrl + "Recipe/GetRecipesByCategoryId?id=\(categoryId)"), type: .GET) { request in
             URLSession(
                 configuration: URLSessionConfiguration.default,
                 delegate: sessionDelegate,

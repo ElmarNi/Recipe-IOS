@@ -32,11 +32,12 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         return spinner
     }()
     
-    private let heartImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "suit.heart", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .regular))
-        imageView.tintColor = .white
-        return imageView
+    private let heartButton: UIButton = {
+        let button = UIButton()
+//        button.setTitle(nil, for: .normal)
+        button.setImage(UIImage(systemName: "suit.heart", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .regular)), for: .normal)
+        button.tintColor = .white
+        return button
     }()
     
     private let likesLabel: UILabel = {
@@ -102,16 +103,17 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         contentView.addSubview(image)
         image.addSubview(overlayView)
-        likesStackView.addSubview(heartImageView)
+        likesStackView.addSubview(heartButton)
         likesStackView.addSubview(likesLabel)
-        image.addSubview(likesStackView)
-        image.addSubview(peopleImageView)
-        image.addSubview(peopleLabel)
-        image.addSubview(timeImageView)
-        image.addSubview(timeLabel)
-        image.addSubview(authorNameLabel)
-        image.addSubview(nameLabel)
-        image.addSubview(spinner)
+        contentView.addSubview(likesStackView)
+        contentView.addSubview(peopleImageView)
+        contentView.addSubview(peopleLabel)
+        contentView.addSubview(timeImageView)
+        contentView.addSubview(timeLabel)
+        contentView.addSubview(authorNameLabel)
+        contentView.addSubview(nameLabel)
+        contentView.addSubview(spinner)
+        heartButton.addTarget(self, action: #selector(buttonDidTapped), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -126,11 +128,11 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         authorNameLabel.sizeToFit()
         nameLabel.sizeToFit()
         
-        image.frame = CGRect(x: 10, y: 5, width: contentView.width - 20, height: contentView.height - 10)
+        image.frame = CGRect(x: 0, y: 0, width: contentView.width, height: contentView.height)
         overlayView.frame = CGRect(x: 0, y: 0, width: image.width, height: image.width)
         likesStackView.frame = CGRect(x: 0, y: 10, width: image.width, height: 25)
-        heartImageView.frame = CGRect(x: likesStackView.width - 38, y: 0, width: 28, height: 25)
-        likesLabel.frame = CGRect(x: heartImageView.left - likesLabel.width - 5, y: 0, width: likesLabel.width, height: 25)
+        heartButton.frame = CGRect(x: likesStackView.width - 38, y: 0, width: 28, height: 25)
+        likesLabel.frame = CGRect(x: heartButton.left - likesLabel.width - 5, y: 0, width: likesLabel.width, height: 25)
         peopleImageView.frame = CGRect(x: image.width - 33, y: image.height - 30, width: 23, height: 20)
         peopleLabel.frame = CGRect(x: peopleImageView.left - peopleLabel.width - 5, y: image.height - 30, width: peopleLabel.width, height: 20)
         timeImageView.frame = CGRect(x: image.width - 33, y: image.height - 55, width: 23, height: 20)
@@ -143,6 +145,10 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         spinner.frame = CGRect(x: image.width / 2, y: image.height / 2, width: 0, height: 0)
     }
     
+    @objc private func buttonDidTapped() {
+        print("TAPPED")
+    }
+    
     public func configure(with model: Recipe) {
         likesLabel.text = "\(model.likes)"
         peopleLabel.text = "\(model.people)"
@@ -153,11 +159,5 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         image.download(from: url, sessionDelegate: self) {[weak self] in
             self?.spinner.stopAnimating()
         }
-    }
-}
-
-extension PopularRecipeCollectionViewCell: URLSessionDelegate {
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
     }
 }

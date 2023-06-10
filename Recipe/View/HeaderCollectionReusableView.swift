@@ -22,6 +22,7 @@ class HeaderCollectionReusableView: UICollectionReusableView {
         super.init(frame: frame)
         backgroundColor = .systemBackground
         addSubview(label)
+        
     }
 
     required init?(coder: NSCoder) {

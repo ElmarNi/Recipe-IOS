@@ -13,9 +13,9 @@ enum SectionType {
     case recommendedRecipes(viewModels: [Recipe])
     var title: String {
         switch self {
-        case .categories: return "Top Categories"
-        case .popularRecipes: return "Popular recipes"
-        case .recommendedRecipes: return "Recommended recipes"
+        case .categories: return "Categories"
+        case .popularRecipes: return "Get Inspired with Tasty Recipes"
+        case .recommendedRecipes: return "Cook Like a Pro"
         }
     }
 }
@@ -57,6 +57,9 @@ class HomeViewController: UIViewController {
         view.addSubview(collectionView)
         view.addSubview(spinner)
         getDatas()
+        
+//        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+//        collectionView.addGestureRecognizer(longPressGesture)
     }
     
     override func viewDidLayoutSubviews() {
@@ -64,6 +67,26 @@ class HomeViewController: UIViewController {
         collectionView.frame = view.bounds
         spinner.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
         spinner.center = view.center
+    }
+    
+    @objc private func longPressed(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            let point = sender.location(in: collectionView)
+            guard let indexPath = collectionView.indexPathForItem(at: point), indexPath.section == 2 || indexPath.section == 1 else { return }
+            var recipe: Recipe?
+            switch sections[indexPath.section] {
+            case .recommendedRecipes(let model):
+                recipe = model[indexPath.row]
+            default: break
+            }
+            
+            let alertController = UIAlertController(title: "Add to bookmarks", message: "Would you like add \(recipe?.name ?? "") to bookmarks?", preferredStyle: .actionSheet)
+            alertController.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
+                print("OK")
+            }))
+            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            present(alertController, animated: true)
+        }
     }
     
     private func getDatas() {
@@ -96,7 +119,7 @@ class HomeViewController: UIViewController {
             case .success(let popularRecipesModel):
                 popularRecipes = popularRecipesModel
             case .failure(_):
-                showAlert(title: "Error", message: "Can't get categories", target: self)
+                showAlert(title: "Error", message: "Can't get recipes", target: self)
             }
         }
         
@@ -108,7 +131,7 @@ class HomeViewController: UIViewController {
             case .success(let recommendedRecipesModel):
                 recommendedRecipes = recommendedRecipesModel
             case .failure(_):
-                showAlert(title: "Error", message: "Can't get categories", target: self)
+                showAlert(title: "Error", message: "Can't get recipes", target: self)
             }
         }
         
@@ -139,9 +162,11 @@ class HomeViewController: UIViewController {
             let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                                                  heightDimension: .fractionalHeight(1)))
             
+            item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5)
+            
             //group
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
-                layoutSize: NSCollectionLayoutSize(widthDimension: .absolute(UIScreen.main.bounds.width / 2), heightDimension: .absolute(100)),
+                layoutSize: NSCollectionLayoutSize(widthDimension: .absolute(UIScreen.main.bounds.width / 2 - 20), heightDimension: .absolute(100)),
                 repeatingSubitem: item,
                 count: 1)
             
@@ -154,6 +179,8 @@ class HomeViewController: UIViewController {
             //item
             let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                                                  heightDimension: .fractionalHeight(1)))
+            
+            item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5)
             
             //group
             let verticalGroup = NSCollectionLayoutGroup.vertical(
@@ -169,7 +196,7 @@ class HomeViewController: UIViewController {
             //section
             let section = NSCollectionLayoutSection(group: horizontalGroup)
             section.orthogonalScrollingBehavior = .groupPaging
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 7, trailing: 0)
             section.boundarySupplementaryItems = supplementaryItems
             return section
         default:
@@ -177,10 +204,12 @@ class HomeViewController: UIViewController {
             let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                                                  heightDimension: .fractionalHeight(1)))
             
+            item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
+            
             //group
             let verticalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                   heightDimension: .absolute(130)),
+                                                   heightDimension: .absolute(120)),
                 repeatingSubitem: item,
                 count: 1)
             
@@ -248,10 +277,20 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
         header.configure(with: sections[indexPath.section].title)
         return header
     }
-}
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch sections[indexPath.section]{
+            
+        case .categories(let model):
+            let category = model[indexPath.row]
+            let categoryVC = CategoryViewController(category: category)
+            navigationController?.pushViewController(categoryVC, animated: true)
 
-extension HomeViewController: URLSessionDelegate {
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+        case .popularRecipes(let model):
+            break
+        case .recommendedRecipes(let model):
+            break
+        }
     }
+    
 }
