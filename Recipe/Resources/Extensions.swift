@@ -54,6 +54,7 @@ extension String {
         return boundingBox.height
     }
 }
+
 extension UIImageView {
     func download(from url: URL, sessionDelegate: URLSessionDelegate, completion: (() -> Void)? = nil) {
         DispatchQueue.main.async {

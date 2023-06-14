@@ -15,8 +15,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         let window = UIWindow(frame: UIScreen.main.bounds)
-        let tabBarController = TabBarViewController()
-        window.rootViewController = tabBarController
+        if(AuthManager.shared.isSignedIn) {
+            let tabBarController = TabBarViewController()
+            window.rootViewController = tabBarController
+        }
+        else {
+            let welcomeVC = UINavigationController(rootViewController: WelcomeViewController())
+            welcomeVC.navigationBar.prefersLargeTitles = false
+            welcomeVC.viewControllers.first?.navigationItem.largeTitleDisplayMode = .never
+            window.rootViewController = welcomeVC
+        }
         window.makeKeyAndVisible()
         self.window = window
         return true

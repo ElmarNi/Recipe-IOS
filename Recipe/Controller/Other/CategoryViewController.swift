@@ -39,7 +39,7 @@ class CategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        title = category.name
         view.backgroundColor = .systemBackground
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: view.width, height: 120)
@@ -48,12 +48,11 @@ class CategoryViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(RecommendedRecipeCollectionViewCell.self, forCellWithReuseIdentifier: RecommendedRecipeCollectionViewCell.identifier)
-        collectionView.register(CategoryHeaderCollectionReusableView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: CategoryHeaderCollectionReusableView.identifier)
         view.addSubview(collectionView)
         view.addSubview(spinner)
         getRecipesByCategory()
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+        collectionView.addGestureRecognizer(gesture)
     }
     
     override func viewDidLayoutSubviews() {
@@ -78,6 +77,22 @@ class CategoryViewController: UIViewController {
         }
     }
     
+    @objc private func longPressed(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            let point = sender.location(in: collectionView)
+            guard let indexPath = collectionView.indexPathForItem(at: point) else { return }
+            
+            let recipe = recipes[indexPath.row]
+            
+            let alertController = UIAlertController(title: "Add to bookmarks", message: "Would you like add \(recipe.name) to bookmarks?", preferredStyle: .actionSheet)
+            alertController.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
+                print("OK")
+            }))
+            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            present(alertController, animated: true)
+        }
+    }
+    
 }
 
 extension CategoryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -96,26 +111,9 @@ extension CategoryViewController: UICollectionViewDelegate, UICollectionViewData
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) ->
-    UICollectionReusableView {
-        guard let header = collectionView.dequeueReusableSupplementaryView(
-            ofKind: kind,
-            withReuseIdentifier: CategoryHeaderCollectionReusableView.identifier,
-            for: indexPath) as? CategoryHeaderCollectionReusableView
-        else {
-            return UICollectionReusableView()
-        }
-        header.configure(with: category)
-        return header
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) ->
-    CGSize
-    {
-        let nameLabelHeight = category.name.getHeightForLabel(font: .systemFont(ofSize: 20, weight: .semibold), width: view.width - 20)
-        
-        return CGSize(width: view.width, height: nameLabelHeight + view.width / 2 + 25)
-//        return CGSize(width: 0, height: 0)
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let recipeVC = RecipeViewController(recipe: recipes[indexPath.row])
+        navigationController?.pushViewController(recipeVC, animated: true)
     }
     
 }

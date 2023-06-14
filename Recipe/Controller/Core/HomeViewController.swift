@@ -58,8 +58,9 @@ class HomeViewController: UIViewController {
         view.addSubview(spinner)
         getDatas()
         
-//        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
-//        collectionView.addGestureRecognizer(longPressGesture)
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+        collectionView.addGestureRecognizer(longPressGesture)
+        print(AuthManager.shared.isSignedIn)
     }
     
     override func viewDidLayoutSubviews() {
@@ -76,6 +77,8 @@ class HomeViewController: UIViewController {
             var recipe: Recipe?
             switch sections[indexPath.section] {
             case .recommendedRecipes(let model):
+                recipe = model[indexPath.row]
+            case .popularRecipes(let model):
                 recipe = model[indexPath.row]
             default: break
             }
@@ -282,14 +285,15 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
         switch sections[indexPath.section]{
             
         case .categories(let model):
-            let category = model[indexPath.row]
-            let categoryVC = CategoryViewController(category: category)
+            let categoryVC = CategoryViewController(category: model[indexPath.row])
             navigationController?.pushViewController(categoryVC, animated: true)
 
         case .popularRecipes(let model):
-            break
+            let recipeVC = RecipeViewController(recipe: model[indexPath.row])
+            navigationController?.pushViewController(recipeVC, animated: true)
         case .recommendedRecipes(let model):
-            break
+            let recipeVC = RecipeViewController(recipe: model[indexPath.row])
+            navigationController?.pushViewController(recipeVC, animated: true)
         }
     }
     

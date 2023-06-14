@@ -106,7 +106,7 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
     
 }
 
-extension SearchViewController: UISearchBarDelegate {
+extension SearchViewController: UISearchBarDelegate, SearchResultViewControllerDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let resultController = searchController.searchResultsController as? SearchResultViewController,
@@ -115,7 +115,7 @@ extension SearchViewController: UISearchBarDelegate {
         else {
             return
         }
-        
+        resultController.delegate = self
         resultController.update(with: query)
     }
     
@@ -131,6 +131,11 @@ extension SearchViewController: UISearchBarDelegate {
               query.trimmingCharacters(in: .whitespaces).isEmpty
         else { return }
         resultController.clear()
+    }
+    
+    func didTapRecipe(recipe: Recipe) {
+        let recipeVC = RecipeViewController(recipe: recipe)
+        navigationController?.pushViewController(recipeVC, animated: true)
     }
     
 }

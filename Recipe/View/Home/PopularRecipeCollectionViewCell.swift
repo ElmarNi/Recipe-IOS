@@ -34,7 +34,6 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
     
     private let heartButton: UIButton = {
         let button = UIButton()
-//        button.setTitle(nil, for: .normal)
         button.setImage(UIImage(systemName: "suit.heart", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .regular)), for: .normal)
         button.tintColor = .white
         return button

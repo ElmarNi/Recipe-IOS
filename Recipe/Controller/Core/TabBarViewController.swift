@@ -23,11 +23,12 @@ class TabBarViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        UITabBar.appearance().tintColor = .label
         UINavigationBar.appearance().standardAppearance = UINavigationBarAppearance(barAppearance: appearence)
         UINavigationBar.appearance().compactAppearance = UINavigationBarAppearance(barAppearance: appearence)
         UINavigationBar.appearance().scrollEdgeAppearance = UINavigationBarAppearance(barAppearance: appearence)
         UINavigationBar.appearance().prefersLargeTitles = false
+        UINavigationBar.appearance().tintColor = .label
+        UITabBar.appearance().tintColor = .label
         UITabBar.appearance().standardAppearance = UITabBarAppearance(barAppearance: appearence)
         UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance(barAppearance: appearence)
         
