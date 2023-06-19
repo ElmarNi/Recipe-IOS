@@ -9,7 +9,7 @@ import UIKit
 
 class RegisterViewController: UIViewController {
 
-    let stackView = UIStackView(frame: .zero)
+    let scrollView = UIScrollView(frame: .zero)
     
     let logo: UIImageView = {
         let imageView = UIImageView()
@@ -76,6 +76,8 @@ class RegisterViewController: UIViewController {
         btn.setTitleColor(.systemOrange, for: .normal)
         return btn
     }()
+    
+    private var isShowingKeybord = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,23 +85,29 @@ class RegisterViewController: UIViewController {
         self.navigationController?.navigationBar.tintColor = .label
         self.navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.navigationBar.prefersLargeTitles = false
-        
-        stackView.addSubview(logo)
-        stackView.addSubview(signUpTitleLabel)
-        stackView.addSubview(signUpDescLabel)
-        stackView.addSubview(firstNameFiled)
-        stackView.addSubview(lastNameFiled)
-        stackView.addSubview(emailFiled)
-        stackView.addSubview(usernameFiled)
-        stackView.addSubview(passwordFiled)
-        stackView.addSubview(signUpButton)
-        stackView.addSubview(termsTextView)
-        stackView.addSubview(haveAccountButton)
-        view.addSubview(stackView)
+        passwordFiled.tag = 20
+        scrollView.addSubview(logo)
+        scrollView.addSubview(signUpTitleLabel)
+        scrollView.addSubview(signUpDescLabel)
+        scrollView.addSubview(firstNameFiled)
+        scrollView.addSubview(lastNameFiled)
+        scrollView.addSubview(emailFiled)
+        scrollView.addSubview(usernameFiled)
+        scrollView.addSubview(passwordFiled)
+        scrollView.addSubview(signUpButton)
+        scrollView.addSubview(termsTextView)
+        scrollView.addSubview(haveAccountButton)
+        view.addSubview(scrollView)
         
         termsTextView.delegate = self
         signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
         haveAccountButton.addTarget(self, action: #selector(haveAccountButtonTapped), for: .touchUpInside)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(gesture)
     }
     
     override func viewDidLayoutSubviews() {
@@ -120,13 +128,12 @@ class RegisterViewController: UIViewController {
         termsTextView.frame = CGRect(x: 40, y: signUpButton.bottom + 10, width: view.width - 80, height: 0)
         termsTextView.sizeToFit()
         haveAccountButton.frame = CGRect(x: 40, y: termsTextView.bottom + 10, width: view.width - 80, height: 20)
+        scrollView.frame = view.bounds
+        scrollView.contentSize = CGSize(width: view.width,
+                                        height: signUpTitleLabel.height + signUpDescLabel.height + termsTextView.height + 530)
         
-        stackView.frame = CGRect(x: 0,
-                                 y: 0,
-                                 width: view.width,
-                                 height: signUpTitleLabel.height + signUpDescLabel.height + termsTextView.height + 530)
-        
-        stackView.center = view.center
+        let offsetY = max(((scrollView.bounds.height - scrollView.contentSize.height) * 0.5) - view.safeAreaInsets.top, 0)
+        scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
     }
 
 }
@@ -153,7 +160,42 @@ extension RegisterViewController: UITextViewDelegate {
 extension RegisterViewController {
     
     @objc private func signUpButtonTapped() {
+        guard let firstname = firstNameFiled.text?.trimmingCharacters(in: .whitespaces),
+              let lastname = lastNameFiled.text?.trimmingCharacters(in: .whitespaces),
+              let email = emailFiled.text?.trimmingCharacters(in: .whitespaces),
+              let username = usernameFiled.text?.trimmingCharacters(in: .whitespaces),
+              let password = passwordFiled.text?.trimmingCharacters(in: .whitespaces),
+              !firstname.isEmpty,
+              !lastname.isEmpty,
+              !email.isEmpty,
+              !username.isEmpty,
+              !password.isEmpty
+        else {
+            showAlert(title: "Error", message: "Please fill all fields", target: self)
+            return
+        }
         
+        DispatchQueue.main.async {
+        
+            let model = User(firstname: firstname, lastname: lastname, email: email, userName: username, password: password)
+            AuthManager.shared.register(with: model, sessionDelegate: self) {[weak self] result in
+                switch result {
+                    
+                case .success(let model):
+                    if model.code == 200 {
+                        let tabBarController = TabBarViewController()
+                        self?.navigationController?.navigationBar.isHidden = true
+                        self?.navigationController?.pushViewController(tabBarController, animated: true)
+                        self?.navigationController?.viewControllers[0].removeFromParent()
+                    }
+                    else {
+                        showAlert(title: "Error", message: model.description ?? "Something went wrong", target: self)
+                    }
+                case .failure(_):
+                    showAlert(title: "Error", message: "Something went wrong", target: self)
+                }
+            }
+        }
     }
     
     @objc private func haveAccountButtonTapped() {
@@ -171,8 +213,25 @@ extension RegisterViewController {
         }
     }
     
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            let offsetY = max(((scrollView.bounds.height - scrollView.contentSize.height) * 0.5) - view.safeAreaInsets.top, 0)
+            scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: keyboardSize.height + 20, right: 0)
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        let offsetY = max(((scrollView.bounds.height - scrollView.contentSize.height) * 0.5) - view.safeAreaInsets.top, 0)
+        scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
+    }
+
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     private func showWebViewController(with urlString: String) {
         let webVCNavController = UINavigationController(rootViewController: WebViewController(urlString: urlString))
         present(webVCNavController, animated: true)
     }
+    
 }

@@ -9,7 +9,7 @@ import UIKit
 
 class LoginViewController: UIViewController {
 
-    let stackView = UIStackView(frame: .zero)
+    let scrollView = UIScrollView(frame: .zero)
     
     let logo: UIImageView = {
         let imageView = UIImageView()
@@ -64,17 +64,23 @@ class LoginViewController: UIViewController {
         self.navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.navigationBar.prefersLargeTitles = false
         
-        stackView.addSubview(logo)
-        stackView.addSubview(signInTitleLabel)
-        stackView.addSubview(signInDescLabel)
-        stackView.addSubview(usernameFiled)
-        stackView.addSubview(passwordFiled)
-        stackView.addSubview(signInButton)
-        stackView.addSubview(createAccountButton)
-        view.addSubview(stackView)
+        scrollView.addSubview(logo)
+        scrollView.addSubview(signInTitleLabel)
+        scrollView.addSubview(signInDescLabel)
+        scrollView.addSubview(usernameFiled)
+        scrollView.addSubview(passwordFiled)
+        scrollView.addSubview(signInButton)
+        scrollView.addSubview(createAccountButton)
+        view.addSubview(scrollView)
         
         signInButton.addTarget(self, action: #selector(signInButtonTapped), for: .touchUpInside)
         createAccountButton.addTarget(self, action: #selector(createAccountButtonTapped), for: .touchUpInside)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(gesture)
     }
     
     override func viewDidLayoutSubviews() {
@@ -90,17 +96,61 @@ class LoginViewController: UIViewController {
         passwordFiled.frame = CGRect(x: 40, y: usernameFiled.bottom + 10, width: view.width - 80, height: 50)
         signInButton.frame = CGRect(x: 40, y: passwordFiled.bottom + 10, width: view.width - 80, height: 50)
         createAccountButton.frame = CGRect(x: 40, y: signInButton.bottom + 30, width: view.width - 80, height: 20)
-        stackView.frame = CGRect(x: 0,
-                                 y: 0,
-                                 width: view.width,
-                                 height: signInTitleLabel.height + signInDescLabel.height + 360)
+        scrollView.frame = view.bounds
+        scrollView.contentSize = CGSize(width: view.width,
+                                        height: signInTitleLabel.height + signInDescLabel.height + 360)
         
-        stackView.center = view.center
+        let offsetY = max(((scrollView.bounds.height - scrollView.contentSize.height) * 0.5) - view.safeAreaInsets.top, 0)
+        scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
+    }
+    
+}
+
+extension LoginViewController {
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            let offsetY = max(((scrollView.bounds.height - scrollView.contentSize.height) * 0.5) - view.safeAreaInsets.top, 0)
+            scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: keyboardSize.height + 20, right: 0)
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        let offsetY = max(((scrollView.bounds.height - scrollView.contentSize.height) * 0.5) - view.safeAreaInsets.top, 0)
+        scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
     }
     
     @objc private func signInButtonTapped() {
-        print("SignIn")
+        
+        guard let username = usernameFiled.text?.trimmingCharacters(in: .whitespaces),
+              let password = passwordFiled.text?.trimmingCharacters(in: .whitespaces),
+              !username.isEmpty,
+              !password.isEmpty
+        else {
+            showAlert(title: "Error", message: "Username or Password incorrect", target: self)
+            return
+        }
+        
+        DispatchQueue.main.async {
+            AuthManager.shared.signIn(username: username, password: password, sessionDelegate: self) {[weak self] result in
+                if result {
+                    let tabBarController = TabBarViewController()
+                    self?.navigationController?.navigationBar.isHidden = true
+                    self?.navigationController?.pushViewController(tabBarController, animated: true)
+                    self?.navigationController?.viewControllers[0].removeFromParent()
+                }
+                else {
+                    showAlert(title: "Error", message: "Username or Password incorrect", target: self)
+                }
+            }
+        }
+        
     }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     @objc private func createAccountButtonTapped() {
         
         if let navController = self.navigationController,
@@ -116,4 +166,5 @@ class LoginViewController: UIViewController {
             }
         }
     }
+    
 }

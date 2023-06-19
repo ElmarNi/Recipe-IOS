@@ -123,16 +123,7 @@ class RecipeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(image: UIImage(systemName: "suit.heart"),
-                            style: .plain,
-                            target: self,
-                            action: #selector(heartButtonTaped)),
-            UIBarButtonItem(image: UIImage(systemName: "bookmark"),
-                            style: .plain,
-                            target: self,
-                            action: #selector(bookmarkButtonTaped))
-        ]
+        
         tableListView.delegate = self
         tableListView.dataSource = self
         configure()
@@ -153,6 +144,21 @@ class RecipeViewController: UIViewController {
         scrollView.addSubview(authorNameLabel)
         scrollView.addSubview(tableListView)
         scrollView.addSubview(descriptionLabel)
+        
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        
+        if isSignedIn {
+            navigationItem.rightBarButtonItems = [
+                UIBarButtonItem(image: UIImage(systemName: "suit.heart"),
+                                style: .plain,
+                                target: self,
+                                action: #selector(heartButtonTaped)),
+                UIBarButtonItem(image: UIImage(systemName: "bookmark"),
+                                style: .plain,
+                                target: self,
+                                action: #selector(bookmarkButtonTaped))
+            ]
+        }
     }
     
     override func viewDidLayoutSubviews() {

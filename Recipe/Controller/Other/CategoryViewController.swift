@@ -51,8 +51,13 @@ class CategoryViewController: UIViewController {
         view.addSubview(collectionView)
         view.addSubview(spinner)
         getRecipesByCategory()
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
-        collectionView.addGestureRecognizer(gesture)
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        
+        if isSignedIn {
+            let gesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+            collectionView.addGestureRecognizer(gesture)
+        }
+
     }
     
     override func viewDidLayoutSubviews() {

@@ -112,7 +112,11 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(authorNameLabel)
         contentView.addSubview(nameLabel)
         contentView.addSubview(spinner)
-        heartButton.addTarget(self, action: #selector(buttonDidTapped), for: .touchUpInside)
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        
+        if isSignedIn {
+            heartButton.addTarget(self, action: #selector(buttonDidTapped), for: .touchUpInside)
+        }
     }
     
     required init?(coder: NSCoder) {

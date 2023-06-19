@@ -19,6 +19,7 @@
 		EB4748782A26A9E1009618E6 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4748772A26A9E1009618E6 /* BookmarksViewController.swift */; };
 		EB47487A2A26A9E5009618E6 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4748792A26A9E5009618E6 /* ProfileViewController.swift */; };
 		EB4D952D2A38853700DD589A /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4D952C2A38853700DD589A /* AuthManager.swift */; };
+		EB5BD5F62A3FBFDB00EA6C18 /* NotSignedIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5BD5F52A3FBFDB00EA6C18 /* NotSignedIn.swift */; };
 		EB82498F2A3A47F4003837B3 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB82498E2A3A47F4003837B3 /* WelcomeViewController.swift */; };
 		EB8249912A3A5BD3003837B3 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB8249902A3A5BD3003837B3 /* WebViewController.swift */; };
 		EB8B3A062A290CA300F64B55 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB8B3A052A290CA300F64B55 /* Extensions.swift */; };
@@ -30,6 +31,9 @@
 		EB9F592F2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9F592E2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift */; };
 		EBA164652A2A01F1007D9F11 /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA164642A2A01F1007D9F11 /* CategoryCollectionViewCell.swift */; };
 		EBC7E5032A33E49F007630DE /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC7E5022A33E49F007630DE /* CategoryViewController.swift */; };
+		EBCCF9D92A40CE5C00E1C5AD /* ProfileDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBCCF9D82A40CE5C00E1C5AD /* ProfileDetailViewController.swift */; };
+		EBCFDAEB2A40484900BE3DB3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBCFDAEA2A40484900BE3DB3 /* User.swift */; };
+		EBCFDAED2A4050AA00BE3DB3 /* RegisterResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBCFDAEC2A4050AA00BE3DB3 /* RegisterResponse.swift */; };
 		EBE1E4432A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE1E4422A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift */; };
 		EBE1E4452A333EC3005EB3CA /* SearchResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE1E4442A333EC3005EB3CA /* SearchResultViewController.swift */; };
 		EBF41D062A28DAE60093F43A /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF41D052A28DAE60093F43A /* Category.swift */; };
@@ -52,6 +56,7 @@
 		EB4748772A26A9E1009618E6 /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
 		EB4748792A26A9E5009618E6 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		EB4D952C2A38853700DD589A /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		EB5BD5F52A3FBFDB00EA6C18 /* NotSignedIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotSignedIn.swift; sourceTree = "<group>"; };
 		EB82498E2A3A47F4003837B3 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		EB8249902A3A5BD3003837B3 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		EB8B3A052A290CA300F64B55 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -63,6 +68,9 @@
 		EB9F592E2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendedRecipeCollectionViewCell.swift; sourceTree = "<group>"; };
 		EBA164642A2A01F1007D9F11 /* CategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		EBC7E5022A33E49F007630DE /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
+		EBCCF9D82A40CE5C00E1C5AD /* ProfileDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDetailViewController.swift; sourceTree = "<group>"; };
+		EBCFDAEA2A40484900BE3DB3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		EBCFDAEC2A4050AA00BE3DB3 /* RegisterResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterResponse.swift; sourceTree = "<group>"; };
 		EBE1E4422A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		EBE1E4442A333EC3005EB3CA /* SearchResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultViewController.swift; sourceTree = "<group>"; };
 		EBF41D052A28DAE60093F43A /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
@@ -118,6 +126,7 @@
 				EB4748592A26A164009618E6 /* LaunchScreen.storyboard */,
 				EBE1E4422A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift */,
 				EB9E12502A39DB9C000B43E6 /* AccountField.swift */,
+				EB5BD5F52A3FBFDB00EA6C18 /* NotSignedIn.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -127,6 +136,7 @@
 			children = (
 				EBF41D052A28DAE60093F43A /* Category.swift */,
 				EB9F592C2A2F02F60080D9B9 /* Recipe.swift */,
+				EBCFDAEA2A40484900BE3DB3 /* User.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -134,6 +144,7 @@
 		EB4748662A26A194009618E6 /* ResponseModel */ = {
 			isa = PBXGroup;
 			children = (
+				EBCFDAEC2A4050AA00BE3DB3 /* RegisterResponse.swift */,
 			);
 			path = ResponseModel;
 			sourceTree = "<group>";
@@ -183,6 +194,7 @@
 		EB47486B2A26A24B009618E6 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				EBCCF9D72A40CE4700E1C5AD /* Profile */,
 				EB7B77EB2A3A697900FFF056 /* WelcomeAndAccount */,
 				EBE1E4442A333EC3005EB3CA /* SearchResultViewController.swift */,
 				EBC7E5022A33E49F007630DE /* CategoryViewController.swift */,
@@ -211,6 +223,14 @@
 				EB9F592E2A2F3EC70080D9B9 /* RecommendedRecipeCollectionViewCell.swift */,
 			);
 			path = Home;
+			sourceTree = "<group>";
+		};
+		EBCCF9D72A40CE4700E1C5AD /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				EBCCF9D82A40CE5C00E1C5AD /* ProfileDetailViewController.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -292,6 +312,8 @@
 				EB82498F2A3A47F4003837B3 /* WelcomeViewController.swift in Sources */,
 				EBC7E5032A33E49F007630DE /* CategoryViewController.swift in Sources */,
 				EB2FEF362A3512B30005E0B6 /* RecipeViewController.swift in Sources */,
+				EBCFDAED2A4050AA00BE3DB3 /* RegisterResponse.swift in Sources */,
+				EB5BD5F62A3FBFDB00EA6C18 /* NotSignedIn.swift in Sources */,
 				EB4748712A26A296009618E6 /* TabBarViewController.swift in Sources */,
 				EBF41D082A28DBAD0093F43A /* APICaller.swift in Sources */,
 				EB8249912A3A5BD3003837B3 /* WebViewController.swift in Sources */,
@@ -300,11 +322,13 @@
 				EBFBBB7C2A2E3E1300FEF482 /* HeaderCollectionReusableView.swift in Sources */,
 				EB4748752A26A9CF009618E6 /* AddViewController.swift in Sources */,
 				EB47484F2A26A163009618E6 /* AppDelegate.swift in Sources */,
+				EBCFDAEB2A40484900BE3DB3 /* User.swift in Sources */,
 				EBE1E4452A333EC3005EB3CA /* SearchResultViewController.swift in Sources */,
 				EB9F592D2A2F02F60080D9B9 /* Recipe.swift in Sources */,
 				EB9E12512A39DB9C000B43E6 /* AccountField.swift in Sources */,
 				EBF41D062A28DAE60093F43A /* Category.swift in Sources */,
 				EB4748512A26A163009618E6 /* SceneDelegate.swift in Sources */,
+				EBCCF9D92A40CE5C00E1C5AD /* ProfileDetailViewController.swift in Sources */,
 				EB47487A2A26A9E5009618E6 /* ProfileViewController.swift in Sources */,
 				EBE1E4432A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift in Sources */,
 				EB8B3A062A290CA300F64B55 /* Extensions.swift in Sources */,

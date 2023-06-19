@@ -9,21 +9,33 @@ import UIKit
 
 class AddViewController: UIViewController {
 
+    private let notSignedIn = NotSignedIn(frame: .zero)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .systemBackground
+        view.addSubview(notSignedIn)
+        
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        notSignedIn.isHidden = isSignedIn
+        notSignedIn.delegate = self
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        notSignedIn.frame = CGRect(x: 0, y: 0, width: view.width, height: view.height)
     }
-    */
 
+}
+
+extension AddViewController: NotSignedInDelegate {
+    
+    func notSignedInTapped() {
+        let welcomeVC = WelcomeViewController()
+        navigationController?.navigationBar.isHidden = true
+        tabBarController?.tabBar.isHidden = true
+        navigationController?.pushViewController(welcomeVC, animated: true)
+        navigationController?.viewControllers[0].removeFromParent()
+    }
+    
 }

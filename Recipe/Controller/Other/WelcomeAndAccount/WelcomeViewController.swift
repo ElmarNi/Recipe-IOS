@@ -108,6 +108,7 @@ class WelcomeViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         navigationController?.pushViewController(tabBarController, animated: true)
         navigationController?.viewControllers[0].removeFromParent()
+        UserDefaults.standard.setValue(false, forKey: "isSignedIn")
     }
     
     @objc private func createAccountButtonTapped() {

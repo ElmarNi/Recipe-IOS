@@ -50,6 +50,7 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(UserDefaults.standard.value(forKey: "userId"))
         view.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -58,9 +59,12 @@ class HomeViewController: UIViewController {
         view.addSubview(spinner)
         getDatas()
         
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
-        collectionView.addGestureRecognizer(longPressGesture)
-        print(AuthManager.shared.isSignedIn)
+        
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        if isSignedIn {
+            let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+            collectionView.addGestureRecognizer(longPressGesture)
+        }
     }
     
     override func viewDidLayoutSubviews() {

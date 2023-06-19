@@ -67,8 +67,14 @@ class SearchResultViewController: UIViewController {
         collectionView.delegate = self
         view.addSubview(spinner)
         view.addSubview(noRecipeLabel)
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
-        collectionView.addGestureRecognizer(gesture)
+        
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        
+        if isSignedIn {
+            let gesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+            collectionView.addGestureRecognizer(gesture)
+        }
+        
     }
     
     override func viewDidLayoutSubviews() {
