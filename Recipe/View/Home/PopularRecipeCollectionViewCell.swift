@@ -32,11 +32,10 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         return spinner
     }()
     
-    private let heartButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "suit.heart", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .regular)), for: .normal)
-        button.tintColor = .white
-        return button
+    private let likesImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.tintColor = .white
+        return imageView
     }()
     
     private let likesLabel: UILabel = {
@@ -44,6 +43,7 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 14, weight: .bold)
         label.textColor = .white
         label.numberOfLines = 1
+        label.textAlignment = .right
         return label
     }()
     
@@ -102,7 +102,7 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         contentView.addSubview(image)
         image.addSubview(overlayView)
-        likesStackView.addSubview(heartButton)
+        likesStackView.addSubview(likesImageView)
         likesStackView.addSubview(likesLabel)
         contentView.addSubview(likesStackView)
         contentView.addSubview(peopleImageView)
@@ -112,11 +112,6 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(authorNameLabel)
         contentView.addSubview(nameLabel)
         contentView.addSubview(spinner)
-        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
-        
-        if isSignedIn {
-            heartButton.addTarget(self, action: #selector(buttonDidTapped), for: .touchUpInside)
-        }
     }
     
     required init?(coder: NSCoder) {
@@ -134,8 +129,8 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         image.frame = CGRect(x: 0, y: 0, width: contentView.width, height: contentView.height)
         overlayView.frame = CGRect(x: 0, y: 0, width: image.width, height: image.width)
         likesStackView.frame = CGRect(x: 0, y: 10, width: image.width, height: 25)
-        heartButton.frame = CGRect(x: likesStackView.width - 38, y: 0, width: 28, height: 25)
-        likesLabel.frame = CGRect(x: heartButton.left - likesLabel.width - 5, y: 0, width: likesLabel.width, height: 25)
+        likesImageView.frame = CGRect(x: likesStackView.width - 38, y: 0, width: 28, height: 25)
+        likesLabel.frame = CGRect(x: 10, y: 0, width: likesStackView.width - 53, height: 25)
         peopleImageView.frame = CGRect(x: image.width - 33, y: image.height - 30, width: 23, height: 20)
         peopleLabel.frame = CGRect(x: peopleImageView.left - peopleLabel.width - 5, y: image.height - 30, width: peopleLabel.width, height: 20)
         timeImageView.frame = CGRect(x: image.width - 33, y: image.height - 55, width: 23, height: 20)
@@ -148,19 +143,22 @@ class PopularRecipeCollectionViewCell: UICollectionViewCell {
         spinner.frame = CGRect(x: image.width / 2, y: image.height / 2, width: 0, height: 0)
     }
     
-    @objc private func buttonDidTapped() {
-        print("TAPPED")
-    }
-    
-    public func configure(with model: Recipe) {
+    public func configure(with model: Recipe, isLiked: Bool) {
         likesLabel.text = "\(model.likes)"
         peopleLabel.text = "\(model.people)"
         timeLabel.text = model.time
         nameLabel.text = model.name
         authorNameLabel.text = model.authorName
+        likesImageView.image = UIImage(systemName: isLiked ? "suit.heart.fill" : "suit.heart",
+                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: 20, weight: .regular))
         guard let url = URL(string: model.imageUrl ?? "") else { return }
         image.download(from: url, sessionDelegate: self) {[weak self] in
             self?.spinner.stopAnimating()
         }
+    }
+    
+    public func like(likes: Int) {
+        likesImageView.image = UIImage(systemName: "suit.heart.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 20, weight: .regular))
+        likesLabel.text = "\(likes)"
     }
 }

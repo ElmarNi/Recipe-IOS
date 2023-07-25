@@ -86,3 +86,18 @@ func showAlert(title: String, message: String, target: UIViewController?) {
     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
     target.present(alert, animated: true)
 }
+
+extension UIScrollView {
+    func setContentSize() {
+        var newHeight: CGFloat = 0
+        for view in subviews {
+            let ref = view.frame.origin.y + view.frame.height
+            if ref > newHeight {
+                newHeight = ref
+            }
+        }
+        let oldSize = contentSize
+        let newSize = CGSize(width: oldSize.width, height: newHeight + 100)
+        contentSize = newSize
+    }
+}

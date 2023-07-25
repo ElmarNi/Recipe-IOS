@@ -12,7 +12,7 @@ class TabBarViewController: UITabBarController {
     private let homeController = HomeViewController()
     private let searchController = SearchViewController()
     private let addController = AddViewController()
-    private let bookmarkController = BookmarksViewController()
+    private let bookmarkController = BookmarksViewController(isForUserRecipes: false)
     private let profileController = ProfileViewController()
     
     private let appearence: UIBarAppearance = {

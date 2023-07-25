@@ -59,6 +59,7 @@ final class AuthManager {
                         completion(true)
                         UserDefaults.standard.set(true, forKey: "isSignedIn")
                         UserDefaults.standard.set(userId, forKey: "userId")
+                        UserDefaults.standard.set(username, forKey: "username")
                     }
                     else {
                         completion(false)
@@ -101,6 +102,7 @@ final class AuthManager {
                     let result = try JSONDecoder().decode(RegisterResponse.self, from: data)
                     UserDefaults.standard.set(true, forKey: "isSignedIn")
                     UserDefaults.standard.set(result.userId, forKey: "userId")
+                    UserDefaults.standard.set(model.userName, forKey: "username")
                     completion(.success(result))
                 }
                 catch {

@@ -36,7 +36,7 @@ class SearchViewController: UIViewController {
                                                                 NSCollectionLayoutSize(widthDimension: .absolute(UIScreen.main.bounds.width / 3),
                                                                                        heightDimension: .absolute(UIScreen.main.bounds.width / 3)),
                                                                repeatingSubitem: item,
-                                                               count: 4)
+                                                               count: 3)
                 
                 //section
                 let section = NSCollectionLayoutSection(group: group)
@@ -134,7 +134,7 @@ extension SearchViewController: UISearchBarDelegate, SearchResultViewControllerD
     }
     
     func didTapRecipe(recipe: Recipe) {
-        let recipeVC = RecipeViewController(recipe: recipe)
+        let recipeVC = RecipeViewController(recipeId: recipe.id ?? 0)
         navigationController?.pushViewController(recipeVC, animated: true)
     }
     

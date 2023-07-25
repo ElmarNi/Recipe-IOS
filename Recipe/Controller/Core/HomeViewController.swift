@@ -23,6 +23,7 @@ enum SectionType {
 class HomeViewController: UIViewController {
     
     private var sections = [SectionType]()
+    private var likedRecipes = [Recipe]()
     
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -43,28 +44,34 @@ class HomeViewController: UIViewController {
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
-        spinner.startAnimating()
         spinner.hidesWhenStopped = true
         return spinner
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(UserDefaults.standard.value(forKey: "userId"))
         view.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
         
         view.addSubview(collectionView)
         view.addSubview(spinner)
-        getDatas()
-        
         
         guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
         if isSignedIn {
             let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(doubleTap(_:)))
+            tap.numberOfTapsRequired = 2
+            tap.delaysTouchesBegan = true
             collectionView.addGestureRecognizer(longPressGesture)
+            collectionView.addGestureRecognizer(tap)
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        spinner.startAnimating()
+        getDatas()
     }
     
     override func viewDidLayoutSubviews() {
@@ -77,7 +84,7 @@ class HomeViewController: UIViewController {
     @objc private func longPressed(_ sender: UILongPressGestureRecognizer) {
         if sender.state == .began {
             let point = sender.location(in: collectionView)
-            guard let indexPath = collectionView.indexPathForItem(at: point), indexPath.section == 2 || indexPath.section == 1 else { return }
+            guard let indexPath = collectionView.indexPathForItem(at: point), indexPath.section != 0 else { return }
             var recipe: Recipe?
             switch sections[indexPath.section] {
             case .recommendedRecipes(let model):
@@ -89,10 +96,62 @@ class HomeViewController: UIViewController {
             
             let alertController = UIAlertController(title: "Add to bookmarks", message: "Would you like add \(recipe?.name ?? "") to bookmarks?", preferredStyle: .actionSheet)
             alertController.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
-                print("OK")
+                DispatchQueue.main.async {
+                    guard let userId = UserDefaults.standard.value(forKey: "userId") as? String,
+                          let recipe = recipe
+                    else { return }
+                    ApiCaller.shared.addBookmark(userId: userId, recipeId: recipe.id ?? 0, sessionDelegate: self) { result in
+                        if result {
+                            showAlert(title: "Success", message: "Recipe added to bookmarks", target: self)
+                        }
+                        else {
+                            showAlert(title: "Error", message: "Recipe not added to bookmarks", target: self)
+                        }
+                    }
+                }
             }))
             alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(alertController, animated: true)
+        }
+    }
+    
+    @objc private func doubleTap(_ sender: UITapGestureRecognizer) {
+        let point = sender.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: point), indexPath.section != 0 else { return }
+        var recipe: Recipe?
+        switch sections[indexPath.section] {
+        case .recommendedRecipes(let model):
+            recipe = model[indexPath.row]
+        case .popularRecipes(let model):
+            recipe = model[indexPath.row]
+        default: break
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let userId = UserDefaults.standard.value(forKey: "userId") as? String,
+                  let recipe = recipe
+            else { return }
+            var isLiked = false
+            self?.likedRecipes.forEach { item in
+                if item.id == recipe.id {
+                    isLiked = true
+                }
+            }
+            if isLiked { return }
+            ApiCaller.shared.like(userId: userId, recipeId: recipe.id ?? 0, sessionDelegate: self!) { result in
+                if result {
+                    switch self?.sections[indexPath.section] {
+                    case .popularRecipes(_):
+                        guard let cell = self?.collectionView.cellForItem(at: indexPath) as? PopularRecipeCollectionViewCell else { return }
+                        cell.like(likes: (recipe.likes + 1))
+                    case .recommendedRecipes(_):
+                        guard let cell = self?.collectionView.cellForItem(at: indexPath) as? RecommendedRecipeCollectionViewCell else { return }
+                        cell.like(likes: (recipe.likes + 1))
+                    default:
+                        break
+                    }
+                }
+            }
         }
     }
     
@@ -101,10 +160,26 @@ class HomeViewController: UIViewController {
         dispatchGroup.enter()
         dispatchGroup.enter()
         dispatchGroup.enter()
+        dispatchGroup.enter()
+        sections = []
         
         var categories = [Category]()
         var popularRecipes = [Recipe]()
         var recommendedRecipes = [Recipe]()
+        var likededRecipes = [Recipe]()
+        if let userId = UserDefaults.standard.value(forKey: "userId") as? String {
+            ApiCaller.shared.getLikes(userId: userId, sessinDelegate: self) {[weak self] result in
+                defer {
+                    dispatchGroup.leave()
+                }
+                switch result {
+                case .success(let model):
+                    likededRecipes = model
+                case .failure(_):
+                    showAlert(title: "Error", message: "Can't get is recipe bookmarked", target: self)
+                }
+            }
+        }
         
         ApiCaller.shared.getCategories(sessionDelegate: self) {[weak self] result in
             defer {
@@ -144,6 +219,7 @@ class HomeViewController: UIViewController {
         
         dispatchGroup.notify(queue: .main) { [weak self] in
             self?.configureModels(categories: categories, popularRecipes: popularRecipes, recommendedRecipes: recommendedRecipes)
+            self?.likedRecipes = likededRecipes
         }
     }
     
@@ -260,14 +336,27 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                     as? PopularRecipeCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            cell.configure(with: models[indexPath.row])
+            var isLiked = false
+            likedRecipes.forEach { item in
+                if item.id == models[indexPath.row].id {
+                    isLiked = true
+                }
+            }
+            cell.configure(with: models[indexPath.row], isLiked: isLiked)
             return cell
         case .recommendedRecipes(let models):
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecommendedRecipeCollectionViewCell.identifier, for: indexPath)
                     as? RecommendedRecipeCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            cell.configure(with: models[indexPath.row])
+            var isLiked = false
+            likedRecipes.forEach { item in
+                if item.id == models[indexPath.row].id {
+                    isLiked = true
+                }
+            }
+            
+            cell.configure(with: models[indexPath.row], isLiked: isLiked)
             return cell
         }
     }
@@ -293,10 +382,10 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             navigationController?.pushViewController(categoryVC, animated: true)
 
         case .popularRecipes(let model):
-            let recipeVC = RecipeViewController(recipe: model[indexPath.row])
+            let recipeVC = RecipeViewController(recipeId: model[indexPath.row].id ?? 0)
             navigationController?.pushViewController(recipeVC, animated: true)
         case .recommendedRecipes(let model):
-            let recipeVC = RecipeViewController(recipe: model[indexPath.row])
+            let recipeVC = RecipeViewController(recipeId: model[indexPath.row].id ?? 0)
             navigationController?.pushViewController(recipeVC, animated: true)
         }
     }

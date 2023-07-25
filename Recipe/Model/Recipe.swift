@@ -9,12 +9,12 @@ import Foundation
 
 struct Recipe: Codable {
     let authorName: String
-    let category: Category
+    let category: Category?
     let description: String
-    let id: Int
+    let id: Int?
     let imageUrl: String?
     let ingridients: String
-    let likes: Int
+    var likes: Int
     let name: String
     let people: Int
     let time: String

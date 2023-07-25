@@ -91,7 +91,17 @@ class CategoryViewController: UIViewController {
             
             let alertController = UIAlertController(title: "Add to bookmarks", message: "Would you like add \(recipe.name) to bookmarks?", preferredStyle: .actionSheet)
             alertController.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
-                print("OK")
+                DispatchQueue.main.async {
+                    guard let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
+                    ApiCaller.shared.addBookmark(userId: userId, recipeId: recipe.id ?? 0, sessionDelegate: self) { result in
+                        if result {
+                            showAlert(title: "Success", message: "Recipe added to bookmarks", target: self)
+                        }
+                        else {
+                            showAlert(title: "Error", message: "Recipe not added to bookmarks", target: self)
+                        }
+                    }
+                }
             }))
             alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(alertController, animated: true)
@@ -112,12 +122,12 @@ extension CategoryViewController: UICollectionViewDelegate, UICollectionViewData
         else {
             return UICollectionViewCell()
         }
-        cell.configure(with: recipes[indexPath.row])
+        cell.configure(with: recipes[indexPath.row], isLiked: false)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let recipeVC = RecipeViewController(recipe: recipes[indexPath.row])
+        let recipeVC = RecipeViewController(recipeId: recipes[indexPath.row].id ?? 0)
         navigationController?.pushViewController(recipeVC, animated: true)
     }
     

@@ -70,6 +70,20 @@ class RecommendedRecipeCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private let likesImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.tintColor = .secondaryLabel
+        return imageView
+    }()
+    
+    private let likesLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14, weight: .bold)
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 1
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .systemGray6
@@ -77,6 +91,8 @@ class RecommendedRecipeCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(peopleLabel)
         contentView.addSubview(timeImageView)
         contentView.addSubview(timeLabel)
+        contentView.addSubview(likesImageView)
+        contentView.addSubview(likesLabel)
         contentView.addSubview(authorNameLabel)
         contentView.addSubview(nameLabel)
         contentView.addSubview(image)
@@ -92,6 +108,7 @@ class RecommendedRecipeCollectionViewCell: UICollectionViewCell {
         super.layoutSubviews()
         peopleLabel.sizeToFit()
         timeLabel.sizeToFit()
+        likesLabel.sizeToFit()
         authorNameLabel.sizeToFit()
         nameLabel.sizeToFit()
         
@@ -103,16 +120,29 @@ class RecommendedRecipeCollectionViewCell: UICollectionViewCell {
         peopleLabel.frame = CGRect(x: peopleImageView.right, y: contentView.bottom - 30, width: peopleLabel.width, height: 20)
         timeImageView.frame = CGRect(x: peopleLabel.right + 5, y: contentView.bottom - 30, width: 23, height: 20)
         timeLabel.frame = CGRect(x: timeImageView.right + 3, y: contentView.bottom - 30, width: timeLabel.width, height: 20)
+        likesImageView.frame = CGRect(x: timeLabel.right + 5, y: contentView.bottom - 30, width: 23, height: 20)
+        likesLabel.frame = CGRect(x: likesImageView.right + 5, y: contentView.bottom - 30, width: likesLabel.width, height: 20)
     }
     
-    public func configure(with model: Recipe) {
+    public func configure(with model: Recipe, isLiked: Bool) {
         peopleLabel.text = "\(model.people)"
         timeLabel.text = model.time
+        likesLabel.text = "\(model.likes)"
         nameLabel.text = model.name
         authorNameLabel.text = model.authorName
+        likesImageView.image = UIImage(systemName: isLiked ? "suit.heart.fill" : "suit.heart",
+                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: 20, weight: .regular))
+        
         guard let url = URL(string: model.imageUrl ?? "") else { return }
         image.download(from: url, sessionDelegate: self) {[weak self] in
             self?.spinner.stopAnimating()
         }
+    }
+    
+    public func like(likes: Int) {
+        likesImageView.image = UIImage(systemName: "suit.heart.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 20, weight: .regular))
+        likesLabel.text = "\(likes)"
+        likesLabel.sizeToFit()
+        likesLabel.frame = CGRect(x: likesImageView.right + 5, y: contentView.bottom - 30, width: likesLabel.width, height: 20)
     }
 }

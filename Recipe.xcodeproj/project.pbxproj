@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		EB2FEF362A3512B30005E0B6 /* RecipeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2FEF352A3512B30005E0B6 /* RecipeViewController.swift */; };
+		EB3339AB2A4195C300E6E6A7 /* BookmarkCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB3339AA2A4195C300E6E6A7 /* BookmarkCollectionViewCell.swift */; };
 		EB47484F2A26A163009618E6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB47484E2A26A163009618E6 /* AppDelegate.swift */; };
 		EB4748512A26A163009618E6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4748502A26A163009618E6 /* SceneDelegate.swift */; };
 		EB4748582A26A164009618E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB4748572A26A164009618E6 /* Assets.xcassets */; };
@@ -43,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		EB2FEF352A3512B30005E0B6 /* RecipeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeViewController.swift; sourceTree = "<group>"; };
+		EB3339AA2A4195C300E6E6A7 /* BookmarkCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkCollectionViewCell.swift; sourceTree = "<group>"; };
 		EB47484B2A26A163009618E6 /* Recipe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recipe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB47484E2A26A163009618E6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EB4748502A26A163009618E6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				EBE1E4422A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift */,
 				EB9E12502A39DB9C000B43E6 /* AccountField.swift */,
 				EB5BD5F52A3FBFDB00EA6C18 /* NotSignedIn.swift */,
+				EB3339AA2A4195C300E6E6A7 /* BookmarkCollectionViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -333,6 +336,7 @@
 				EBE1E4432A331F5F005EB3CA /* SearchCategoryCollectionViewCell.swift in Sources */,
 				EB8B3A062A290CA300F64B55 /* Extensions.swift in Sources */,
 				EB47486F2A26A269009618E6 /* HomeViewController.swift in Sources */,
+				EB3339AB2A4195C300E6E6A7 /* BookmarkCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

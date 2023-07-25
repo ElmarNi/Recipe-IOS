@@ -52,11 +52,12 @@ class ProfileViewController: UIViewController {
     private func configureSections() {
         
         let viewYourRecipes = Option(title: "View your recipes") {
-            print("View recipes")
+            let recipesVC = BookmarksViewController(isForUserRecipes: true)
+            self.navigationController?.pushViewController(recipesVC, animated: true)
         }
         
         let viewYourBookmarks = Option(title: "View your bookmarks") {
-            print("View bookmarks")
+            self.tabBarController?.selectedIndex = 3
         }
         
         let viewYourProfile = Option(title: "View your profile") {[weak self] in

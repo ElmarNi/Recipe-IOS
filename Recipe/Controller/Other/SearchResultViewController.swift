@@ -46,10 +46,10 @@ class SearchResultViewController: UIViewController {
                 
                 //group
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize:
-                                                                NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                                                       heightDimension: .absolute(150)),
+                                                                NSCollectionLayoutSize(widthDimension: .absolute(UIScreen.main.bounds.width / 2),
+                                                                                       heightDimension: .absolute(UIScreen.main.bounds.width / 2 + 75)),
                                                                repeatingSubitem: item,
-                                                               count: 4)
+                                                               count: 2)
                 
                 //section
                 let section = NSCollectionLayoutSection(group: group)
@@ -62,7 +62,7 @@ class SearchResultViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         view.addSubview(collectionView)
-        collectionView.register(PopularRecipeCollectionViewCell.self, forCellWithReuseIdentifier: PopularRecipeCollectionViewCell.identifier)
+        collectionView.register(BookmarkCollectionViewCell.self, forCellWithReuseIdentifier: BookmarkCollectionViewCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
         view.addSubview(spinner)
@@ -122,7 +122,17 @@ class SearchResultViewController: UIViewController {
             
             let alertController = UIAlertController(title: "Add to bookmarks", message: "Would you like add \(recipe.name) to bookmarks?", preferredStyle: .actionSheet)
             alertController.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
-                print("OK")
+                DispatchQueue.main.async {
+                    guard let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
+                    ApiCaller.shared.addBookmark(userId: userId, recipeId: recipe.id ?? 0, sessionDelegate: self) { result in
+                        if result {
+                            showAlert(title: "Success", message: "Recipe added to bookmarks", target: self)
+                        }
+                        else {
+                            showAlert(title: "Error", message: "Recipe not added to bookmarks", target: self)
+                        }
+                    }
+                }
             }))
             alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             present(alertController, animated: true)
@@ -137,8 +147,8 @@ extension SearchResultViewController: UICollectionViewDelegate, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularRecipeCollectionViewCell.identifier, for: indexPath)
-                as? PopularRecipeCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BookmarkCollectionViewCell.identifier, for: indexPath)
+                as? BookmarkCollectionViewCell
         else {
             return UICollectionViewCell()
         }

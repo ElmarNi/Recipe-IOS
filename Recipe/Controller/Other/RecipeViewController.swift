@@ -9,8 +9,11 @@ import UIKit
 
 class RecipeViewController: UIViewController {
     
-    private let recipe: Recipe
+    private var recipeId: Int
     private var ingridients = [String]()
+    private var isBookmarked = false
+    private var isLiked = false
+    private var recipe: Recipe?
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
@@ -108,11 +111,18 @@ class RecipeViewController: UIViewController {
         return label
     }()
     
+    private let spinnerMain: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.hidesWhenStopped = true
+        spinner.startAnimating()
+        return spinner
+    }()
+    
     private let scrollView = UIScrollView()
     
-    init(recipe: Recipe) {
-        self.recipe = recipe
-        self.ingridients = recipe.ingridients.components(separatedBy: ",")
+    init(recipeId: Int) {
+        self.recipeId = recipeId
+//        self.ingridients = recipe.ingridients.components(separatedBy: ",")
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -126,7 +136,7 @@ class RecipeViewController: UIViewController {
         
         tableListView.delegate = self
         tableListView.dataSource = self
-        configure()
+        getRecipe(recipeId: recipeId)
         scrollView.backgroundColor = .systemBackground
         view.addSubview(scrollView)
         scrollView.addSubview(image)
@@ -144,25 +154,129 @@ class RecipeViewController: UIViewController {
         scrollView.addSubview(authorNameLabel)
         scrollView.addSubview(tableListView)
         scrollView.addSubview(descriptionLabel)
+        view.addSubview(spinnerMain)
         
-        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool else { return }
+        guard let isSignedIn = UserDefaults.standard.value(forKey: "isSignedIn") as? Bool,
+              let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
         
         if isSignedIn {
-            navigationItem.rightBarButtonItems = [
-                UIBarButtonItem(image: UIImage(systemName: "suit.heart"),
-                                style: .plain,
-                                target: self,
-                                action: #selector(heartButtonTaped)),
-                UIBarButtonItem(image: UIImage(systemName: "bookmark"),
-                                style: .plain,
-                                target: self,
-                                action: #selector(bookmarkButtonTaped))
-            ]
+            isLikedAndBookmarked(userId: userId, recipeId: recipeId)
         }
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        spinnerMain.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
+        spinnerMain.center = view.center
+    }
+    
+    @objc private func heartButtonTaped() {
+        if isLiked {
+            DispatchQueue.main.async {
+                guard let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
+                ApiCaller.shared.unLike(userId: userId, recipeId: self.recipeId, sessionDelegate: self) {[weak self] result in
+                    if result {
+                        self?.navigationItem.rightBarButtonItems?[0].image = UIImage(systemName: "suit.heart")
+                        self?.isLiked = false
+                        if self?.recipe != nil {
+                            self?.recipe?.likes -= 1
+                            self?.likesLabel.text = "\(self?.recipe?.likes ?? 0)"
+                        }
+                    }
+                    else {
+                        showAlert(title: "Error", message: "Something went wrong", target: self)
+                    }
+                }
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                guard let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
+                ApiCaller.shared.like(userId: userId, recipeId: self.recipeId, sessionDelegate: self) {[weak self] result in
+                    if result {
+                        self?.navigationItem.rightBarButtonItems?[0].image = UIImage(systemName: "suit.heart.fill")
+                        self?.isLiked = true
+                        if self?.recipe != nil {
+                            self?.recipe?.likes += 1
+                            self?.likesLabel.text = "\(self?.recipe?.likes ?? 0)"
+                        }
+                    }
+                    else {
+                        showAlert(title: "Error", message: "Something went wrong", target: self)
+                    }
+                }
+            }
+        }
+        likesLabel.sizeToFit()
+        likesLabel.frame = CGRect(x: heartImageView.right, y: 0, width: likesLabel.width, height: 25)    }
+    
+    @objc private func bookmarkButtonTaped() {
+        if isBookmarked {
+            DispatchQueue.main.async {
+                guard let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
+                ApiCaller.shared.removeBookmark(userId: userId, recipeId: self.recipeId, sessionDelegate: self) {[weak self] result in
+                    if result {
+                        showAlert(title: "Success", message: "Recipe removed from bookmarks", target: self)
+                        self?.navigationItem.rightBarButtonItems?[1].image = UIImage(systemName: "bookmark")
+                        self?.isBookmarked = false
+                    }
+                    else {
+                        showAlert(title: "Error", message: "Recipe not removed from bookmarks", target: self)
+                    }
+                }
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                guard let userId = UserDefaults.standard.value(forKey: "userId") as? String else { return }
+                ApiCaller.shared.addBookmark(userId: userId, recipeId: self.recipeId, sessionDelegate: self) {[weak self] result in
+                    if result {
+                        showAlert(title: "Success", message: "Recipe added to bookmarks", target: self)
+                        self?.navigationItem.rightBarButtonItems?[1].image = UIImage(systemName: "bookmark.fill")
+                        self?.isBookmarked = true
+                    }
+                    else {
+                        showAlert(title: "Error", message: "Recipe not added to bookmarks", target: self)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func getRecipe(recipeId: Int) {
+        DispatchQueue.main.async {
+            ApiCaller.shared.getRecipe(with: recipeId, sessionDelegate: self) {[weak self] result in
+                switch result {
+                case .success(let model):
+                    self?.recipe = model
+                    self?.ingridients = model.ingridients.components(separatedBy: ",")
+                    self?.configure(recipe: model)
+                    self?.spinnerMain.stopAnimating()
+                case .failure(_):
+                    self?.spinnerMain.stopAnimating()
+                    self?.spinner.stopAnimating()
+                    showAlert(title: "Error", message: "Can't get recipe", target: self)
+                }
+                
+            }
+        }
+    }
+    
+    private func configure(recipe: Recipe) {
+        likesLabel.text = "\(recipe.likes)"
+        peopleLabel.text = "\(recipe.people)"
+        timeLabel.text = recipe.time
+        nameLabel.text = recipe.name
+        authorNameLabel.text = recipe.authorName
+        descriptionLabel.text = recipe.description
+        guard let url = URL(string: recipe.imageUrl ?? "") else { return }
+        image.download(from: url, sessionDelegate: self) {[weak self] in
+            self?.spinner.stopAnimating()
+        }
+        updateUI(recipe: recipe)
+    }
+    
+    private func updateUI(recipe: Recipe) {
         likesLabel.sizeToFit()
         peopleLabel.sizeToFit()
         timeLabel.sizeToFit()
@@ -176,10 +290,10 @@ class RecipeViewController: UIViewController {
         spinner.frame = CGRect(x: image.width / 2, y: image.height / 2, width: 0, height: 0)
         
         timeImageView.frame = CGRect(x: 0, y: 0, width: 23, height: 25)
-        timeLabel.frame = CGRect(x: timeImageView.right, y: 0, width: timeLabel.width, height: 25)
-        timeStackView.frame = CGRect(x: view.width - (timeLabel.width + timeImageView.width + 10),
+        timeLabel.frame = CGRect(x: timeImageView.right, y: 0, width: timeLabel.width + 2, height: 25)
+        timeStackView.frame = CGRect(x: view.width - (timeLabel.width + timeImageView.width + 12),
                                      y: image.bottom + 5,
-                                     width: timeLabel.width + timeImageView.width,
+                                     width: timeLabel.width + timeImageView.width + 2,
                                      height: 25)
         
         peopleImageView.frame = CGRect(x: 0, y: 0, width: 23, height: 25)
@@ -190,7 +304,7 @@ class RecipeViewController: UIViewController {
                                         height: 25)
         
         heartImageView.frame = CGRect(x: 0, y: 0, width: 28, height: 25)
-        likesLabel.frame = CGRect(x: heartImageView.right, y: 0, width: likesLabel.width, height: 25)
+        likesLabel.frame = CGRect(x: heartImageView.right, y: 0, width: max(20, likesLabel.width), height: 25)
         likesStackView.frame = CGRect(x: view.width - (likesLabel.width + likesLabel.width + timeStackView.width + peoplesStackView.width + 30),
                                       y: image.bottom + 5,
                                       width: likesLabel.width + likesLabel.width,
@@ -201,7 +315,7 @@ class RecipeViewController: UIViewController {
         
         var tableHeight:CGFloat = 0
         for ingridient in ingridients {
-            tableHeight += ingridient.getHeightForLabel(font: .systemFont(ofSize: 14, weight: .semibold), width: view.width - 100) + 10
+            tableHeight += ingridient.getHeightForLabel(font: .systemFont(ofSize: 14, weight: .semibold), width: view.width - 110) + 10
         }
         
         tableListView.frame = CGRect(x: 40, y: authorNameLabel.bottom + 10, width: view.width - 80, height: tableHeight)
@@ -212,24 +326,60 @@ class RecipeViewController: UIViewController {
         scrollView.contentSize = CGSize(width: view.width, height: scrollViewHeight)
     }
     
-    @objc private func heartButtonTaped() {
-        print("Hear tapped in recipe")
+    private func isBookmarked(userId: String, recipeId: Int, completion: @escaping (Bool) -> Void) {
+        ApiCaller.shared.getBookmarks(userId: userId, sessinDelegate: self) {[weak self] result in
+            switch result {
+            case .success(let model):
+                model.forEach {[weak self] item in
+                    if item.id == recipeId {
+                        self?.isBookmarked = true
+                    }
+                }
+                completion(true)
+            case .failure(_):
+                showAlert(title: "Error", message: "Can't get is recipe bookmarked", target: self)
+                completion(false)
+            }
+        }
     }
     
-    @objc private func bookmarkButtonTaped() {
-        print("Bookmark tapped in recipe")
+    private func isLiked(userId: String, recipeId: Int, completion: @escaping (Bool) -> Void) {
+        ApiCaller.shared.getLikes(userId: userId, sessinDelegate: self) {[weak self] result in
+            switch result {
+            case .success(let model):
+                model.forEach {[weak self] item in
+                    if item.id == recipeId {
+                        self?.isLiked = true
+                    }
+                }
+                completion(true)
+            case .failure(_):
+                showAlert(title: "Error", message: "Can't get is recipe liked", target: self)
+                completion(false)
+            }
+        }
     }
     
-    private func configure() {
-        likesLabel.text = "\(recipe.likes)"
-        peopleLabel.text = "\(recipe.people)"
-        timeLabel.text = recipe.time
-        nameLabel.text = recipe.name
-        authorNameLabel.text = recipe.authorName
-        descriptionLabel.text = recipe.description
-        guard let url = URL(string: recipe.imageUrl ?? "") else { return }
-        image.download(from: url, sessionDelegate: self) {[weak self] in
-            self?.spinner.stopAnimating()
+    private func isLikedAndBookmarked(userId: String, recipeId: Int) {
+        DispatchQueue.main.async {[weak self] in
+            self?.isBookmarked(userId: userId, recipeId: recipeId) { result in
+                if result {
+                    self?.isLiked(userId: userId, recipeId: recipeId) { result in
+                        if result {
+                            self?.navigationItem.rightBarButtonItems = [
+                                UIBarButtonItem(image: UIImage(systemName: self?.isLiked ?? false ? "suit.heart.fill" : "suit.heart"),
+                                                style: .plain,
+                                                target: self,
+                                                action: #selector(self?.heartButtonTaped)),
+                                UIBarButtonItem(image: UIImage(systemName: self?.isBookmarked ?? false ? "bookmark.fill" : "bookmark"),
+                                                style: .plain,
+                                                target: self,
+                                                action: #selector(self?.bookmarkButtonTaped))
+                            ]
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -264,13 +414,13 @@ extension RecipeViewController: UITableViewDelegate, UITableViewDataSource {
         cell.addSubview(ingridientLabel)
         
         dotImageView.frame = CGRect(x: 0, y: (cell.height - 10) / 2, width: 10, height: 10)
-        let labelHeight = ingridients[indexPath.row].getHeightForLabel(font: .systemFont(ofSize: 14, weight: .semibold), width: view.width - 100) + 10
+        let labelHeight = ingridients[indexPath.row].getHeightForLabel(font: .systemFont(ofSize: 14, weight: .semibold), width: view.width - 110) + 10
         ingridientLabel.frame = CGRect(x: dotImageView.right + 10, y: 0, width: cell.width - dotImageView.width - 10, height: labelHeight)
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let labelHeight = ingridients[indexPath.row].getHeightForLabel(font: .systemFont(ofSize: 16, weight: .semibold), width: view.width - 100) + 10
+        let labelHeight = ingridients[indexPath.row].getHeightForLabel(font: .systemFont(ofSize: 14, weight: .semibold), width: view.width - 110) + 10
         return labelHeight
     }
     
